@@ -112,13 +112,12 @@ def follow_index(request):
 def profile_follow(request, username):
     subskribs = Follow.objects.all()
     author = get_object_or_404(User, username=username)
-    following_model = Follow(user=request.user, author=author)
     if (
-        following_model in subskribs
+        subskribs.filter(user=request.user, author=author).exists()
         or request.user.username == author.username
     ):
         return redirect('posts:profile', username=username)
-    following_model.save()
+    Follow.objects.create(user=request.user, author=author)
     return redirect('posts:profile', username=username)
 
 
