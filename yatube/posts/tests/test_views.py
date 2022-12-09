@@ -265,7 +265,7 @@ class PostPagesTests(TestCase):
             Follow.objects.all().count(), count_follow,
             'Нельзя подписываться на самого себя'
         )
-    
+
     def test_double_subsribe(self):
         count_follow = Follow.objects.all().count()
         self.authorized_client.get(reverse('posts:profile_follow', kwargs={
