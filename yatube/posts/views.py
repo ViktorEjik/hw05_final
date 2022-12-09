@@ -113,7 +113,10 @@ def profile_follow(request, username):
     subskribs = Follow.objects.all()
     author = get_object_or_404(User, username=username)
     following_model = Follow(user=request.user, author=author)
-    if following_model in subskribs:
+    if (
+        following_model in subskribs
+        or request.user.username == author.username
+    ):
         return redirect('posts:profile', username=username)
     following_model.save()
     return redirect('posts:profile', username=username)

@@ -255,3 +255,13 @@ class PostPagesTests(TestCase):
             'Пост отобразился не у подписчика'
         )
         following.delete()
+
+    def test_subskribe_on_self(self):
+        count_follow = Follow.objects.all().count()
+        self.authorized_client.get(reverse('posts:profile_follow', kwargs={
+            'username': PostPagesTests.author.username,
+        }))
+        self.assertEqual(
+            Follow.objects.all().count(), count_follow,
+            'Нельзя подписываться на самого себя'
+        )
