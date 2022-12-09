@@ -32,7 +32,9 @@ def group_posts(request, slug):
 def profile(request, username):
     profile = get_object_or_404(User, username=username)
     guest = request.user
-    following = (profile.id,) in guest.follower.values_list('author')
+    following = False
+    if str(guest) != 'AnonymousUser':
+        following = (profile.id,) in guest.follower.values_list('author')
     posts = profile.posts.all()
 
     context = {
