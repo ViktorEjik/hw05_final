@@ -116,7 +116,10 @@ def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
     if (
         request.user == author
-        or subscriptions.filter(author__following__user=request.user).exists()
+        or subscriptions.filter(user=request.user, author=author).exists()
+        # Пытался реализовать через .filter(author__<related_name>__user=...)
+        # Не получилось, заваливались тесты, хоя в базе всё появлялось.
+        # Подскажите как это надо реализовать
     ):
         return redirect('posts:profile', username=username)
     Follow.objects.create(user=request.user, author=author)
