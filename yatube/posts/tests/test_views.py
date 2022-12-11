@@ -49,15 +49,15 @@ class PostPagesTests(TestCase):
             reverse('posts:post_create'): 'posts/create_post.html',
         }
 
-        list = []
+        tmp = []
         for i in range(13):
             post = Post(
                 text=f'Какой-то текст {i}',
                 group=PostPagesTests.newgroup2,
                 author=PostPagesTests.newauthor
             )
-            list.append(post)
-        cls.posts = Post.objects.bulk_create(list)
+            tmp.append(post)
+        cls.posts = Post.objects.bulk_create(tmp)
 
     def setUp(self):
         self.guest = Client()
@@ -256,7 +256,7 @@ class PostPagesTests(TestCase):
         )
         following.delete()
 
-    def test_subskribe_on_self(self):
+    def test_subscribe_on_self(self):
         count_follow = Follow.objects.all().count()
         self.authorized_client.get(reverse('posts:profile_follow', kwargs={
             'username': PostPagesTests.author.username,
@@ -266,7 +266,7 @@ class PostPagesTests(TestCase):
             'Нельзя подписываться на самого себя'
         )
 
-    def test_double_subsribe(self):
+    def test_double_subscribe(self):
         count_follow = Follow.objects.all().count()
         self.authorized_client.get(reverse('posts:profile_follow', kwargs={
             'username': PostPagesTests.newauthor.username,

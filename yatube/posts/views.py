@@ -32,9 +32,10 @@ def group_posts(request, slug):
 def profile(request, username):
     profile = get_object_or_404(User, username=username)
     guest = request.user
-    following = False
-    if str(guest) != 'AnonymousUser':
-        following = (profile.id,) in guest.follower.values_list('author')
+    following = (
+        guest.is_authenticated
+        and guest.follower.filter(user=guest, author=profile).exists()
+    )
     posts = profile.posts.all()
 
     context = {
@@ -79,7 +80,6 @@ def post_edit(request, post_id):
         instance=post
     )
     if form.is_valid():
-        print('ok')
         form.save()
         return redirect('posts:post_detail', post_id=post_id)
     context = {
@@ -112,11 +112,11 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    subskribs = Follow.objects.all()
+    subscriptions = Follow.objects.all()
     author = get_object_or_404(User, username=username)
     if (
-        subskribs.filter(user=request.user, author=author).exists()
-        or request.user.username == author.username
+        request.user == author
+        or subscriptions.filter(author__following__user=request.user).exists()
     ):
         return redirect('posts:profile', username=username)
     Follow.objects.create(user=request.user, author=author)

@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -54,7 +56,7 @@ class CreateFormTests(TestCase):
             'text',
             'Обязательное поле.'
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_edit(self):
         tasks_count = Post.objects.count()
