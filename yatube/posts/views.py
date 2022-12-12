@@ -104,7 +104,8 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    authors = Follow.objects.filter(user=request.user).values('author')
+    authors = Follow.objects.filter(
+        author__following__user=request.user).values('author')
     posts = Post.objects.filter(author__in=authors)
     context = {'page_obj': my_paginator(request, posts, POSTS_COUNT)}
     return render(request, 'posts/follow.html', context)
@@ -112,14 +113,10 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    subscriptions = Follow.objects.all()
     author = get_object_or_404(User, username=username)
     if (
         request.user == author
-        or subscriptions.filter(user=request.user, author=author).exists()
-        # Пытался реализовать через .filter(author__<related_name>__user=...)
-        # Не получилось, заваливались тесты, хоя в базе всё появлялось.
-        # Подскажите как это надо реализовать
+        or Follow.objects.filter(user=request.user, author=author).exists()
     ):
         return redirect('posts:profile', username=username)
     Follow.objects.create(user=request.user, author=author)
